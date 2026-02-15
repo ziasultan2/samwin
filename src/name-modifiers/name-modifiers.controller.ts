@@ -1,11 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { NameModifiersService } from './name-modifiers.service';
-import { CreateNameModifierDto } from './dto/create-name-modifier.dto';
-import { UpdateNameModifierDto } from './dto/update-name-modifier.dto';
 
 @Controller('name-modifiers')
 export class NameModifiersController {
   constructor(private readonly nameModifiersService: NameModifiersService) {}
+
+  @Get('list')
+  list() {
+    return this.nameModifiersService.list();
+  }
 
   @Get('task1')
   task1() {

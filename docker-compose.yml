@@ -32,6 +32,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    command: sh -c "npm run seed && npm run start:dev"
 
 volumes:
   mysql_data:
