@@ -1,0 +1,37 @@
+services:
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: samwin
+      MYSQL_USER: samwin_user
+      MYSQL_PASSWORD: samwin_password
+      MYSQL_ROOT_PASSWORD: samwin_root
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      # Use the actual root password from the environment so the healthcheck succeeds
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-psamwin_root']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build: .
+    env_file:
+      - .env
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+      - '4000:4000'
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  mysql_data:
