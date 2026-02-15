@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { NameModifiersService } from './name-modifiers.service';
+import { NameDTO } from './dto/name.dto';
 
 @Controller('name-modifiers')
 export class NameModifiersController {
@@ -15,9 +16,9 @@ export class NameModifiersController {
     return this.nameModifiersService.task1();
   }
 
-  @Get('task2')
-  task2() {
-    return this.nameModifiersService.task2();
+  @Post('task2')
+  task2(@Body() nameDto: NameDTO) {
+    return this.nameModifiersService.task2(nameDto.name);
   }
 
   @Get('task3')
@@ -25,3 +26,4 @@ export class NameModifiersController {
     return this.nameModifiersService.task3();
   }
 }
+

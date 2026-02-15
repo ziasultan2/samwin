@@ -52,8 +52,70 @@ export class NameModifiersService {
     };
   }
 
-  task2() {
-    return `This action executes task2`;
+  /**
+   * Step 2: Generates all possible variations of a name
+   * For each umlaut/replacement pair, generates all combinations
+   * Examples:
+   * KOESTNER -> [KOESTNER, KÖSTNER]
+   * RUESSWURM -> [RUESSWURM, RÜßWURM, RUEßWURM, RÜSSWURM]
+   * @param name - Input name (e.g., "KOESTNER")
+   * @returns Array of all possible name variations
+   */
+  generateNameVariations(name: string): string[] {
+    if (!name) return [name];
+
+    const upperName = name.toUpperCase();
+    const variations: Set<string> = new Set([upperName]);
+
+    const generateVariationsRecursive = (current: string) => {
+      // Try replacing AE -> Ä
+      if (current.includes('AE')) {
+        const next = current.replace('AE', 'Ä');
+        if (!variations.has(next)) {
+          variations.add(next);
+          generateVariationsRecursive(next);
+        }
+      }
+
+      // Try replacing OE -> Ö
+      if (current.includes('OE')) {
+        const next = current.replace('OE', 'Ö');
+        if (!variations.has(next)) {
+          variations.add(next);
+          generateVariationsRecursive(next);
+        }
+      }
+
+      // Try replacing UE -> Ü
+      if (current.includes('UE')) {
+        const next = current.replace('UE', 'Ü');
+        if (!variations.has(next)) {
+          variations.add(next);
+          generateVariationsRecursive(next);
+        }
+      }
+
+      // Try replacing SS -> ß
+      if (current.includes('SS')) {
+        const next = current.replace('SS', 'ß');
+        if (!variations.has(next)) {
+          variations.add(next);
+          generateVariationsRecursive(next);
+        }
+      }
+    };
+
+    generateVariationsRecursive(upperName);
+    return Array.from(variations).sort();
+  }
+
+  async task2(name: string): Promise<object> {
+    return {
+      results: {
+        input: name,
+        variations: this.generateNameVariations(name),
+      }
+    };
   }
 
   task3() {
