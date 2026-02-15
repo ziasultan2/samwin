@@ -45,7 +45,7 @@ export class NameModifiersService {
     const names = await this.customerRepository.find();
     return {
       count: names.length,
-      output: names.map(customer => ({
+      output: names.map((customer) => ({
         original: customer.name,
         converted: this.convertReplacementLettersToUmlauts(customer.name),
       })),
@@ -114,11 +114,62 @@ export class NameModifiersService {
       results: {
         input: name,
         variations: this.generateNameVariations(name),
-      }
+      },
     };
   }
 
-  task3() {
-    return `This action executes task3`;
+  async task2DynamicOutput(): Promise<object> {
+    const names = await this.customerRepository.find();
+    return {
+      results: names.map((customer) => ({
+        input: customer.name,
+        variations: this.generateNameVariations(customer.name),
+      })),
+    };
+  }
+
+  /**
+   * Step 3: Generates SQL statement to search for all variations of a name
+   * Examples:
+   * KOESTNER -> SELECT * FROM customers WHERE name IN ('KOESTNER', 'KÖSTNER')
+   * RUESSWURM -> SELECT * FROM customers WHERE name IN ('RUESSWURM', 'RÜßWURM', 'RUEßWURM', 'RÜSSWURM')
+   * @param name - Input name (e.g., "KOESTNER")
+   * @param tableName - Table name (default: 'customers')
+   * @param columnName - Column name to search (default: 'name')
+   * @returns SQL statement for searching all variations
+   */
+  generateSearchSQL(
+    name: string,
+    tableName: string = 'customers',
+    columnName: string = 'name',
+  ): string {
+    if (!name) return '';
+
+    const variations = this.generateNameVariations(name);
+
+    // Escape single quotes in names
+    const escapedVariations = variations
+      .map((v) => `'${v.replace(/'/g, "''")}'`)
+      .join(', ');
+
+    return `SELECT * FROM ${tableName} WHERE ${columnName} IN (${escapedVariations})`;
+  }
+
+  async task3(name?: string): Promise<object> {
+    const sqlStatement = this.generateSearchSQL(name);
+    return {
+      input: name,
+      sqlStatement: sqlStatement,
+    };
+  }
+
+  async task3DynamicOutput(): Promise<object> {
+    const names = await this.customerRepository.find();
+    return {
+      sqlStatements: names.map((customer) => ({
+        name: customer.name,
+        sql: this.generateSearchSQL(customer.name),
+      })),
+    };
   }
 }
